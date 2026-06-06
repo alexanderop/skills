@@ -1,5 +1,7 @@
 # Alexander Opalic's Skills
 
+[![skills.sh](https://skills.sh/b/alexanderop/skills)](https://skills.sh/alexanderop/skills)
+
 Agent skills I use for engineering and writing. Small, composable, and installable in one command.
 
 ## Quickstart
