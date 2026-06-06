@@ -17,8 +17,6 @@ Pick the skills and the agents you want to install them on. That's it.
 ### Engineering
 
 - **[clone-repo](./skills/engineering/clone-repo/SKILL.md)** — Vendor a library's source into the current repo as a git subtree under `repos/<name>/` and wire it into `AGENTS.md`, so coding agents read real source instead of stale docs.
-- **[factory-pipeline](./skills/engineering/factory-pipeline/SKILL.md)** — Run a multi-step coding pipeline (PRD → plan → TDD loop → review → PR) by orchestrating fresh subprocesses of your chosen coding harness (Claude Code, Codex, or Copilot CLI).
-- **[lfg](./skills/engineering/lfg/SKILL.md)** — The full autonomous engineering pipeline end-to-end: recall, plan, TDD, review, verify, commit, push, open PR, watch CI, and compound the learning.
 - **[harden-github-actions](./skills/engineering/harden-github-actions/SKILL.md)** — Run `zizmor --persona pedantic` on any GitHub Actions workflow you create or edit, and fix every finding before calling it done.
 - **[c4-architecture](./skills/engineering/c4-architecture/SKILL.md)** — Generate architecture documentation using C4-model Mermaid diagrams (context, container, component, deployment).
 - **[research](./skills/engineering/research/SKILL.md)** — Deep research on a technical problem using parallel subagents (web docs, Stack Overflow, codebase explorer), saving a dated markdown report to `docs/research/`.

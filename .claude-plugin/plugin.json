@@ -2,8 +2,6 @@
   "name": "alexop-skills",
   "skills": [
     "./skills/engineering/clone-repo",
-    "./skills/engineering/factory-pipeline",
-    "./skills/engineering/lfg",
     "./skills/engineering/harden-github-actions",
     "./skills/engineering/c4-architecture",
     "./skills/engineering/research",

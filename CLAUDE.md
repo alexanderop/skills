@@ -12,7 +12,7 @@ scripts/list-skills.sh       # print manifest skills + check each has a SKILL.md
 README.md                    # links every shipped skill to its SKILL.md
 ```
 
-Buckets: `engineering/` (code work), `content/` (writing/docs), `web/` (browser/UI).
+Buckets: `engineering/` (code work), `content/` (writing/docs), `web/` (browser/UI), `workflow/` (everyday git/PR helpers). `in-progress/` holds drafts that are **deliberately excluded** from `.claude-plugin/plugin.json` and `README.md` until they're ready to ship.
 
 ## Rules when adding or editing a skill
 
