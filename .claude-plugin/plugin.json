@@ -1,0 +1,11 @@
+{
+  "name": "alexop-skills",
+  "skills": [
+    "./skills/engineering/clone-repo",
+    "./skills/engineering/factory-pipeline",
+    "./skills/engineering/lfg",
+    "./skills/content/blog-generator",
+    "./skills/content/good-docs-writer",
+    "./skills/web/app-screenshots"
+  ]
+}

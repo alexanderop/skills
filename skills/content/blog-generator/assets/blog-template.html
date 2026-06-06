@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>{{POST_TITLE}}</title>
+<style>
+  /* ─── AstroPaper-style skin tokens ─────────────────────────────────── */
+  :root {
+    --color-fill:        33, 39, 55;
+    --color-text-base:   234, 237, 243;
+    --color-accent:      255, 107, 1;
+    --color-inverted:    33, 39, 55;
+    --color-card:        52, 63, 96;
+    --color-card-muted:  138, 51, 2;
+    --color-border:      171, 75, 8;
+  }
+  html.light {
+    --color-fill:        251, 254, 251;
+    --color-text-base:   40, 39, 40;
+    --color-accent:      0, 108, 172;
+    --color-inverted:    255, 255, 255;
+    --color-card:        230, 230, 230;
+    --color-card-muted:  205, 205, 205;
+    --color-border:      236, 233, 233;
+  }
+
+  /* sun/moon visibility — show the icon for the CURRENT theme */
+  html.dark  #sun-svg  { display: block; }
+  html.dark  #moon-svg { display: none;  }
+  html.light #sun-svg  { display: none;  }
+  html.light #moon-svg { display: block; }
+
+  * { box-sizing: border-box; }
+  html { overflow-y: scroll; }
+  body {
+    margin: 0;
+    display: flex;
+    min-height: 100svh;
+    flex-direction: column;
+    background: rgb(var(--color-fill));
+    color: rgb(var(--color-text-base));
+    font: 15px/1.7 ui-monospace, SFMono-Regular, "JetBrains Mono", "IBM Plex Mono",
+          Menlo, Consolas, monospace;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: rgb(var(--color-accent) / 0.7);
+    color: rgb(var(--color-inverted));
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 0.75rem; }
+  ::-webkit-scrollbar-track { background: rgb(var(--color-fill)); }
+  ::-webkit-scrollbar-thumb { background: rgb(var(--color-card)); }
+  ::-webkit-scrollbar-thumb:hover { background: rgb(var(--color-card-muted)); }
+
+  /* ─── Layout ────────────────────────────────────────────────────────── */
+  header.site {
+    border-bottom: 1px solid rgb(var(--color-border));
+    padding: 14px 22px;
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 920px; margin: 0 auto; width: 100%;
+  }
+  header.site .brand {
+    font-weight: 700; color: rgb(var(--color-accent));
+    text-decoration: none; letter-spacing: -0.01em; font-size: 18px;
+  }
+  header.site nav { display: flex; gap: 18px; align-items: center; }
+  header.site nav a {
+    color: rgb(var(--color-text-base));
+    text-decoration: none; font-size: 14px;
+    border-bottom: 2px solid transparent; padding-bottom: 2px;
+  }
+  header.site nav a:hover { border-bottom-color: rgb(var(--color-accent)); }
+
+  button#theme-btn {
+    background: transparent; border: 0; cursor: pointer; padding: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: rgb(var(--color-text-base)); border-radius: 6px;
+  }
+  button#theme-btn:hover { background: rgb(var(--color-card)); }
+  button#theme-btn svg { width: 22px; height: 22px; fill: currentColor; }
+
+  main {
+    flex: 1; max-width: 720px; margin: 0 auto;
+    padding: 36px 22px 80px; width: 100%;
+  }
+
+  /* ─── Article elements ──────────────────────────────────────────────── */
+  .breadcrumb { font-size: 13px; color: rgb(var(--color-text-base) / 0.7); margin-bottom: 18px; }
+  .breadcrumb a { color: inherit; }
+
+  .post-title {
+    margin: 0 0 16px; font-size: 2.2rem; line-height: 1.18;
+    font-weight: 700; color: rgb(var(--color-accent));
+    letter-spacing: -0.01em;
+  }
+  .lede { color: rgb(var(--color-text-base) / 0.85); font-size: 1.05rem; margin: 0 0 8px; }
+  .meta {
+    color: rgb(var(--color-text-base) / 0.6); font-size: 13px;
+    border-bottom: 1px solid rgb(var(--color-border));
+    padding-bottom: 18px; margin-bottom: 28px;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  }
+  #copy-md-btn {
+    background: rgb(var(--color-card));
+    color: rgb(var(--color-text-base));
+    border: 1px solid rgb(var(--color-border));
+    border-radius: 4px;
+    padding: 5px 10px;
+    font: inherit; font-size: 12.5px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+  }
+  #copy-md-btn:hover {
+    border-color: rgb(var(--color-accent));
+    color: rgb(var(--color-accent));
+  }
+  #copy-md-btn.copied {
+    color: rgb(var(--color-accent));
+    border-color: rgb(var(--color-accent));
+  }
+
+  h2 {
+    font-size: 1.45rem; font-weight: 700;
+    margin: 44px 0 12px; color: rgb(var(--color-text-base));
+  }
+  h2::before { content: "# ";  color: rgb(var(--color-accent)); }
+  h3 {
+    font-size: 1.1rem; font-weight: 700;
+    margin: 28px 0 8px; color: rgb(var(--color-text-base));
+  }
+  h3::before { content: "## "; color: rgb(var(--color-accent)); }
+  h4 {
+    font-size: 1rem; font-weight: 700;
+    margin: 20px 0 6px; color: rgb(var(--color-accent));
+  }
+
+  p { margin: 0 0 14px; }
+  ul, ol { padding-left: 22px; margin: 0 0 14px; }
+  li { margin: 4px 0; }
+
+  a {
+    color: rgb(var(--color-accent));
+    text-decoration: underline; text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  a:hover { text-decoration-thickness: 2px; }
+  a:focus-visible {
+    outline: 2px dashed rgb(var(--color-accent));
+    outline-offset: 2px; text-decoration: none;
+  }
+
+  /* inline code */
+  code {
+    background: rgb(var(--color-card));
+    color: rgb(var(--color-text-base));
+    padding: 1px 6px; border-radius: 4px; font-size: 0.92em;
+    border: 1px solid rgb(var(--color-border) / 0.5);
+  }
+
+  /* code blocks (pre) — fallback before Shiki replaces them */
+  pre {
+    background: rgb(var(--color-card)); color: rgb(var(--color-text-base));
+    border: 1px solid rgb(var(--color-border)); border-radius: 6px;
+    padding: 14px 16px; overflow-x: auto;
+    font-size: 13px; line-height: 1.55; margin: 14px 0 22px;
+  }
+  pre code { background: transparent; border: 0; padding: 0; color: inherit; }
+  /* Shiki keeps our card chrome, drops their inline bg */
+  pre.shiki {
+    background: rgb(var(--color-card)) !important;
+    border: 1px solid rgb(var(--color-border)); border-radius: 6px;
+    padding: 14px 16px; overflow-x: auto;
+    font-size: 13px; line-height: 1.55; margin: 14px 0 22px;
+  }
+  pre.shiki code { background: transparent; padding: 0; border: 0; }
+
+  /* callout */
+  .callout {
+    background: rgb(var(--color-card));
+    border-left: 3px solid rgb(var(--color-accent));
+    padding: 14px 16px; border-radius: 4px; margin: 18px 0;
+  }
+  .callout strong { color: rgb(var(--color-accent)); }
+
+  /* TOC */
+  .toc {
+    background: rgb(var(--color-card));
+    border: 1px solid rgb(var(--color-border));
+    border-radius: 6px; padding: 14px 18px 18px; margin: 0 0 32px;
+  }
+  .toc h3 {
+    margin: 0 0 8px; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: rgb(var(--color-text-base) / 0.7);
+  }
+  .toc h3::before { content: ""; }
+  .toc ol { margin: 0; padding-left: 22px; column-count: 2; column-gap: 28px; }
+  .toc li { break-inside: avoid; margin: 3px 0; font-size: 13.5px; }
+
+  /* mermaid containers */
+  .mermaid {
+    background: rgb(var(--color-card));
+    border: 1px solid rgb(var(--color-border));
+    border-radius: 6px; padding: 18px;
+    margin: 14px 0 22px; text-align: center; overflow-x: auto;
+    position: relative; cursor: zoom-in;
+    transition: border-color 0.15s ease;
+  }
+  .mermaid:hover { border-color: rgb(var(--color-accent)); }
+  .mermaid svg { max-width: 100%; height: auto; pointer-events: none; }
+  .mermaid::after {
+    content: "⤢ click to expand";
+    position: absolute; top: 8px; right: 10px;
+    font-size: 11px; letter-spacing: 0.04em;
+    color: rgb(var(--color-accent));
+    background: rgb(var(--color-fill) / 0.85);
+    padding: 3px 8px; border-radius: 3px;
+    opacity: 0; transition: opacity 0.15s ease;
+    pointer-events: none;
+  }
+  .mermaid:hover::after { opacity: 1; }
+
+  /* fullscreen mermaid dialog */
+  dialog#diagram-dialog {
+    width: 95vw; height: 95vh; max-width: none; max-height: none;
+    background: rgb(var(--color-card));
+    color: rgb(var(--color-text-base));
+    border: 1px solid rgb(var(--color-border));
+    border-radius: 8px; padding: 0; overflow: hidden;
+  }
+  dialog#diagram-dialog::backdrop {
+    background: rgb(var(--color-fill) / 0.85);
+    backdrop-filter: blur(4px);
+  }
+  #diagram-stage {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    padding: 32px;
+  }
+  #diagram-stage svg { width: 100%; height: 100%; max-width: 100%; max-height: 100%; }
+  #diagram-close {
+    position: absolute; top: 10px; right: 14px; z-index: 2;
+    background: transparent; border: 0; cursor: pointer;
+    color: rgb(var(--color-accent));
+    font-size: 26px; line-height: 1; padding: 4px 8px;
+    border-radius: 4px;
+  }
+  #diagram-close:hover { background: rgb(var(--color-card-muted)); }
+
+  /* table */
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 22px; font-size: 13.5px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid rgb(var(--color-border)); }
+  th { color: rgb(var(--color-accent)); font-weight: 700; border-bottom: 2px solid rgb(var(--color-border)); }
+  td code { font-size: 12.5px; }
+
+  hr { border: 0; border-top: 1px solid rgb(var(--color-border)); margin: 40px 0; }
+
+  footer {
+    color: rgb(var(--color-text-base) / 0.6);
+    font-size: 13px; text-align: center;
+    border-top: 1px solid rgb(var(--color-border));
+    padding: 18px 22px;
+    max-width: 920px; margin: 36px auto 0; width: 100%;
+  }
+
+  /* fade-in (respects reduced motion) */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in {
+    animation: fadeIn 0.35s ease-out forwards;
+    animation-delay: var(--animation-delay, 0s);
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: reduce) { .fade-in { animation: none; opacity: 1; } }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <a href="#" class="brand">{{BRAND}}</a>
+  <nav aria-label="primary">
+    <a href="#contents">Contents</a>
+    <a href="#rebuild">Rebuild plan</a>
+    <button id="theme-btn" type="button" aria-label="Toggle theme" title="Toggle light / dark">
+      <svg id="sun-svg" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 4V2m0 20v-2m8-8h2M2 12h2m13.66-5.66l1.41-1.41M4.93 19.07l1.41-1.41m0-11.32L4.93 4.93m14.14 14.14l-1.41-1.41M12 7a5 5 0 100 10 5 5 0 000-10z"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <svg id="moon-svg" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/>
+      </svg>
+    </button>
+  </nav>
+</header>
+
+<main>
+  <div class="breadcrumb"><a href="#">posts</a> / {{SLUG}}</div>
+
+  <h1 class="post-title fade-in">{{POST_TITLE}}</h1>
+  <p class="lede fade-in" style="--animation-delay: 0.05s">{{LEDE}}</p>
+  <div class="meta fade-in" style="--animation-delay: 0.1s">
+    <span>{{KICKER}} · ~{{READ_MIN}}&nbsp;min read</span>
+    <button id="copy-md-btn" type="button" aria-label="Copy post as Markdown">📋 Copy as Markdown</button>
+  </div>
+
+  <nav id="contents" class="toc" aria-label="Table of contents">
+    <h3>Contents</h3>
+    <ol>
+      <!-- one <li><a href="#section-id">Title</a></li> per section -->
+    </ol>
+  </nav>
+
+  <!-- ===== Sections go here ===== -->
+  <!-- pattern:
+    <h2 id="…">…</h2>
+    <p>…</p>
+    <pre><code class="language-ts">…</code></pre>
+    <div class="mermaid">flowchart TD …</div>
+    <div class="callout"><strong>…</strong> …</div>
+  -->
+
+</main>
+
+<dialog id="diagram-dialog" aria-label="Enlarged diagram">
+  <button id="diagram-close" type="button" aria-label="Close diagram">×</button>
+  <div id="diagram-stage"></div>
+</dialog>
+
+<footer>{{FOOTER}}</footer>
+
+<!-- ─── Theme toggle ─────────────────────────────────────────────────── -->
+<script>
+  (function () {
+    const root = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored === 'light' || stored === 'dark') {
+      root.classList.toggle('light', stored === 'light');
+      root.classList.toggle('dark',  stored === 'dark');
+    } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+      root.classList.replace('dark', 'light');
+    }
+    document.getElementById('theme-btn').addEventListener('click', () => {
+      const next = root.classList.contains('dark') ? 'light' : 'dark';
+      root.classList.toggle('dark',  next === 'dark');
+      root.classList.toggle('light', next === 'light');
+      localStorage.setItem('theme', next);
+      window.dispatchEvent(new CustomEvent('themechange', { detail: next }));
+    });
+  })();
+</script>
+
+<!-- ─── Mermaid (CDN ESM) ────────────────────────────────────────────── -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  // Mermaid's theme engine reliably parses hex; the CSS-var triplets ("33, 39, 55")
+  // need to be converted. rgba() falls back to the legacy comma form for alpha.
+  const styleVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const hex  = (n) => '#' + styleVar(n).split(',')
+    .map(s => parseInt(s.trim(), 10).toString(16).padStart(2, '0')).join('');
+  const rgba = (n, a) => {
+    const [r, g, b] = styleVar(n).split(',').map(s => s.trim());
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  };
+
+  function configure() {
+    const isDark = document.documentElement.classList.contains('dark');
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: {
+        darkMode: isDark,
+        fontFamily: 'ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace',
+        fontSize: '13px',
+
+        // Container fill — matches the surrounding .mermaid card.
+        background:           hex('--color-card'),
+
+        // Generic / flowchart node fill: page background, NOT the card colour, so
+        // nodes stand out against the container instead of disappearing into it.
+        primaryColor:         hex('--color-fill'),
+        primaryTextColor:     hex('--color-text-base'),
+        primaryBorderColor:   hex('--color-accent'),
+        secondaryColor:       hex('--color-card-muted'),
+        tertiaryColor:        hex('--color-card'),
+
+        // Edges, links, body text.
+        lineColor:            rgba('--color-text-base', 0.55),
+        defaultLinkColor:     rgba('--color-text-base', 0.55),
+        textColor:            hex('--color-text-base'),
+        titleColor:           hex('--color-accent'),
+
+        // Flowchart specifics.
+        mainBkg:              hex('--color-fill'),
+        nodeBorder:           hex('--color-accent'),
+        clusterBkg:           hex('--color-card-muted'),
+        clusterBorder:        hex('--color-border'),
+        edgeLabelBackground:  hex('--color-card'),
+        nodeTextColor:        hex('--color-text-base'),
+
+        // Sequence diagram.
+        actorBkg:             hex('--color-fill'),
+        actorBorder:          hex('--color-accent'),
+        actorTextColor:       hex('--color-text-base'),
+        actorLineColor:       rgba('--color-text-base', 0.4),
+        signalColor:          hex('--color-accent'),
+        signalTextColor:      hex('--color-text-base'),
+        labelBoxBkgColor:     hex('--color-fill'),
+        labelBoxBorderColor:  hex('--color-accent'),
+        labelTextColor:       hex('--color-text-base'),
+        loopTextColor:        hex('--color-text-base'),
+        noteBkgColor:         hex('--color-card-muted'),
+        noteBorderColor:      hex('--color-border'),
+        noteTextColor:        hex('--color-text-base'),
+        activationBkgColor:   hex('--color-card'),
+        activationBorderColor: hex('--color-accent'),
+        sequenceNumberColor:  hex('--color-inverted'),
+      },
+      flowchart: { htmlLabels: true, curve: 'basis' },
+      sequence:  { actorMargin: 50 },
+    });
+  }
+
+  async function render() {
+    const blocks = document.querySelectorAll('.mermaid');
+    blocks.forEach((b) => {
+      if (!b.dataset.src) b.dataset.src = b.textContent;
+      b.removeAttribute('data-processed');
+      b.innerHTML = b.dataset.src;
+    });
+    configure();
+    await mermaid.run({ nodes: blocks });
+  }
+
+  await render();
+  window.addEventListener('themechange', render);
+</script>
+
+<!-- ─── Mermaid fullscreen-on-click ──────────────────────────────────── -->
+<script>
+  (function () {
+    const dialog = document.getElementById('diagram-dialog');
+    const stage = document.getElementById('diagram-stage');
+    const closeBtn = document.getElementById('diagram-close');
+    if (!dialog || !stage || !closeBtn) return;
+
+    function openDiagram(mermaidEl) {
+      const svg = mermaidEl.querySelector('svg');
+      if (!svg) return;
+      const clone = svg.cloneNode(true);
+      clone.removeAttribute('style');
+      clone.removeAttribute('width');
+      clone.removeAttribute('height');
+      clone.style.maxWidth = '100%';
+      clone.style.maxHeight = '100%';
+      stage.replaceChildren(clone);
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+      else dialog.setAttribute('open', '');
+    }
+
+    document.addEventListener('click', (e) => {
+      if (dialog.open) return;
+      const m = e.target.closest('.mermaid');
+      if (!m) return;
+      e.preventDefault();
+      openDiagram(m);
+    });
+
+    closeBtn.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => {
+      const r = dialog.getBoundingClientRect();
+      const inside =
+        e.clientX >= r.left && e.clientX <= r.right &&
+        e.clientY >= r.top  && e.clientY <= r.bottom;
+      if (!inside) dialog.close();
+    });
+  })();
+</script>
+
+<!-- ─── Copy post as Markdown ────────────────────────────────────────── -->
+<script>
+  (function () {
+    const btn = document.getElementById('copy-md-btn');
+    if (!btn) return;
+
+    function inline(el) {
+      let out = '';
+      el.childNodes.forEach((n) => {
+        if (n.nodeType === 3) { out += n.textContent; return; }
+        if (n.nodeType !== 1) return;
+        const tag = n.tagName.toLowerCase();
+        if (tag === 'code')      out += '`' + n.textContent + '`';
+        else if (tag === 'a')    out += '[' + inline(n) + '](' + (n.getAttribute('href') || '') + ')';
+        else if (tag === 'strong' || tag === 'b') out += '**' + inline(n) + '**';
+        else if (tag === 'em' || tag === 'i')     out += '*' + inline(n) + '*';
+        else if (tag === 'br')   out += '  \n';
+        else                     out += inline(n);
+      });
+      return out;
+    }
+
+    function block(el) {
+      if (el.nodeType !== 1) return '';
+      const tag = el.tagName.toLowerCase();
+      if (tag === 'h1') return '# '    + inline(el).trim();
+      if (tag === 'h2') return '## '   + inline(el).trim();
+      if (tag === 'h3') return '### '  + inline(el).trim();
+      if (tag === 'h4') return '#### ' + inline(el).trim();
+      if (tag === 'p')  return inline(el).trim();
+      if (tag === 'hr') return '---';
+      if (tag === 'ul' || tag === 'ol') {
+        const ordered = tag === 'ol';
+        return Array.from(el.children).map((li, i) =>
+          (ordered ? `${i + 1}. ` : '- ') + inline(li).trim()
+        ).join('\n');
+      }
+      if (tag === 'pre') {
+        // Shiki rewrites <pre><code class="language-X"> into <pre class="shiki" data-src=… data-lang=…>
+        const code = el.dataset.src
+          ?? el.querySelector('code')?.textContent
+          ?? el.textContent;
+        const lang = el.dataset.lang
+          ?? (el.querySelector('code')?.className.match(/language-([\w-]+)/)?.[1])
+          ?? '';
+        return '```' + lang + '\n' + code.replace(/\n$/, '') + '\n```';
+      }
+      if (tag === 'table') {
+        const heads = Array.from(el.querySelectorAll('thead th')).map((th) => inline(th).trim());
+        const rows  = Array.from(el.querySelectorAll('tbody tr')).map((tr) =>
+          Array.from(tr.children).map((td) => inline(td).trim())
+        );
+        const lines = ['| ' + heads.join(' | ') + ' |',
+                       '| ' + heads.map(() => '---').join(' | ') + ' |'];
+        for (const r of rows) lines.push('| ' + r.join(' | ') + ' |');
+        return lines.join('\n');
+      }
+      if (tag === 'div') {
+        if (el.classList.contains('mermaid')) {
+          const src = (el.dataset.src ?? el.textContent).trim();
+          return '```mermaid\n' + src + '\n```';
+        }
+        if (el.classList.contains('callout')) {
+          return inline(el).trim().split('\n').map((l) => '> ' + l).join('\n');
+        }
+      }
+      return '';
+    }
+
+    function postToMarkdown() {
+      const main = document.querySelector('main');
+      const title = document.querySelector('.post-title')?.textContent.trim() ?? '';
+      const lede  = document.querySelector('.lede')?.textContent.trim()  ?? '';
+
+      const out = [];
+      if (title) out.push('# ' + title);
+      if (lede)  out.push('> ' + lede);
+
+      const skipClasses = ['breadcrumb', 'post-title', 'lede', 'meta', 'toc'];
+      for (const child of main.children) {
+        if (child.id === 'contents') continue;
+        if (skipClasses.some((c) => child.classList.contains(c))) continue;
+        const md = block(child);
+        if (md) out.push(md);
+      }
+      return out.join('\n\n').replace(/\n{3,}/g, '\n\n').trim() + '\n';
+    }
+
+    btn.addEventListener('click', async () => {
+      const md = postToMarkdown();
+      const original = btn.textContent;
+      try {
+        await navigator.clipboard.writeText(md);
+        btn.textContent = '✓ Copied';
+        btn.classList.add('copied');
+      } catch (err) {
+        console.warn('[copy-md] clipboard failed', err);
+        btn.textContent = '✗ Copy failed';
+      }
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 1600);
+    });
+  })();
+</script>
+
+<!-- ─── Shiki syntax highlighting (CDN ESM) ──────────────────────────── -->
+<script type="module">
+  import { codeToHtml } from 'https://esm.sh/shiki@1.24.0';
+
+  function themeFor() {
+    return document.documentElement.classList.contains('dark')
+      ? 'github-dark-dimmed' : 'github-light';
+  }
+
+  async function highlight() {
+    const blocks = document.querySelectorAll('pre > code[class*="language-"]:not([data-shiki-done])');
+    const theme = themeFor();
+    for (const block of blocks) {
+      const lang = block.className.match(/language-([\w-]+)/)?.[1] ?? 'text';
+      const code = block.textContent;
+      try {
+        const html = await codeToHtml(code, { lang, theme });
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = html;
+        const newPre = wrapper.firstElementChild;
+        newPre.dataset.shikiDone = 'true';
+        newPre.dataset.lang = lang;
+        newPre.dataset.src = code;
+        block.parentElement.replaceWith(newPre);
+      } catch (err) { console.warn('[shiki]', lang, err); }
+    }
+  }
+  async function rehighlightAll() {
+    const theme = themeFor();
+    for (const pre of document.querySelectorAll('pre.shiki[data-shiki-done]')) {
+      const lang = pre.dataset.lang ?? 'text';
+      const code = pre.dataset.src ?? pre.textContent;
+      try {
+        const html = await codeToHtml(code, { lang, theme });
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = html;
+        const newPre = wrapper.firstElementChild;
+        newPre.dataset.shikiDone = 'true';
+        newPre.dataset.lang = lang;
+        newPre.dataset.src = code;
+        pre.replaceWith(newPre);
+      } catch (err) { console.warn('[shiki rehighlight]', lang, err); }
+    }
+  }
+
+  await highlight();
+  window.addEventListener('themechange', rehighlightAll);
+</script>
+
+</body>
+</html>
