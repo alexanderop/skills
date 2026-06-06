@@ -4,8 +4,18 @@
     "./skills/engineering/clone-repo",
     "./skills/engineering/factory-pipeline",
     "./skills/engineering/lfg",
+    "./skills/engineering/harden-github-actions",
+    "./skills/engineering/c4-architecture",
     "./skills/content/blog-generator",
     "./skills/content/good-docs-writer",
-    "./skills/web/app-screenshots"
+    "./skills/web/app-screenshots",
+    "./skills/web/qa-explore",
+    "./skills/workflow/push",
+    "./skills/workflow/pr",
+    "./skills/workflow/check",
+    "./skills/workflow/fix-pipeline",
+    "./skills/workflow/interview",
+    "./skills/workflow/learn",
+    "./skills/workflow/review-coderabbit"
   ]
 }
