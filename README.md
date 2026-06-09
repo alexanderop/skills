@@ -20,6 +20,7 @@ Pick the skills and the agents you want to install them on. That's it.
 - **[harden-github-actions](./skills/engineering/harden-github-actions/SKILL.md)** — Run `zizmor --persona pedantic` on any GitHub Actions workflow you create or edit, and fix every finding before calling it done.
 - **[c4-architecture](./skills/engineering/c4-architecture/SKILL.md)** — Generate architecture documentation using C4-model Mermaid diagrams (context, container, component, deployment).
 - **[research](./skills/engineering/research/SKILL.md)** — Deep research on a technical problem using parallel subagents (web docs, Stack Overflow, codebase explorer), saving a dated markdown report to `docs/research/`.
+- **[orchestrated-review](./skills/engineering/orchestrated-review/SKILL.md)** — Cloudflare-style multi-agent code review: risk-tiers the diff, filters noise, fans out specialist reviewers (security, performance, code quality, docs, tests, release, AGENTS.md), and consolidates them through a coordinator judge pass into one severity-graded approve/block verdict. Works on local diffs or a GitHub PR.
 
 ### Content
 
